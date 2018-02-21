@@ -28,7 +28,7 @@ export default class WebSocketServer {
     }
 
     public broadcast(channel: string, message: string): void {
-        console.log('broadcast');
+        this.io.to(channel).emit('evt', message);
     }
 
 }

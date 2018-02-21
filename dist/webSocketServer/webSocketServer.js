@@ -13,6 +13,7 @@ class WebSocketServer {
         this.io.on('connect', (socket) => {
             socket.on('subscribeChannel', (message) => {
                 console.log('subscribed: ' + message);
+                socket.join(message);
                 this.redis.subscribe(message);
             });
             socket.on('disconnect', () => {
@@ -21,7 +22,10 @@ class WebSocketServer {
         });
     }
     broadcast(channel, message) {
-        console.log('broadcast');
+        this.io.to(channel).emit('evt', message);
+        // this.io.in(channel).clients((err, client) => {
+        //     console.log(client);
+        // });
     }
 }
 WebSocketServer.PORT = 8080;

@@ -23,9 +23,6 @@ class WebSocketServer {
     }
     broadcast(channel, message) {
         this.io.to(channel).emit('evt', message);
-        // this.io.in(channel).clients((err, client) => {
-        //     console.log(client);
-        // });
     }
 }
 WebSocketServer.PORT = 8080;

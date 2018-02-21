@@ -18,7 +18,7 @@ export default class WebSocketServer {
         this.io.listen(this.port);
         this.io.on('connect', (socket: SocketIO.Socket) => {
             socket.on('subscribeChannel', (message: string) => {
-                console.log('subscribed: ' + message);
+                socket.join(message);
                 this.redis.subscribe(message);
             });
             socket.on('disconnect', () => {

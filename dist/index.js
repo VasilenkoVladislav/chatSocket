@@ -18,8 +18,7 @@ class App {
             console.log('connected to redis');
         });
         this.client.on("message", (channel, message) => {
-            console.log("Message '" + message + "' on channel '" + channel + "' arrived!");
-            this.webSocketServer.broadcast(channel, message);
+            this.webSocketServer.broadcastMessage(channel, message);
         });
     }
 }

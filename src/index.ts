@@ -22,7 +22,7 @@ class App {
             console.log('connected to redis');
         });
         this.client.on("message", (channel: string, message: string) => {
-            this.webSocketServer.broadcast(channel, message);
+            this.webSocketServer.broadcastMessage(channel, message);
         })
     }
 }

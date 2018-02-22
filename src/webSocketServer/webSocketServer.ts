@@ -25,17 +25,25 @@ export default class WebSocketServer {
             };
             socket.on('subscribeChannel', (message: string) => {
                 socket.join(message);
-                this.redis.subscribe(`${message}?${client}`);
+                this.clients[client + message] = {
+                    'socket': socket.id
+                };
+                this.redis.subscribe(`${client}?${message}`);
             });
             socket.on('disconnect', () => {
-                this.redis.unsubscribe();
+                for (let name in this.clients) {
+                    if (this.clients[name].socket === socket.id) {
+                        delete this.clients[name];
+                        this.redis.unsubscribe(name);
+                    }
+                }
             });
         });
     }
 
     public broadcastMessage(channel: string, message: string): void {
-        const conversationId :string = channel.split('?')[0];
-        const clientId :any = channel.split('?')[1];
+        const clientId :string = channel.split('?')[0];
+        const conversationId :string = channel.split('?')[1];
         if (conversationId && clientId) {
             this.io.sockets.connected[this.clients[clientId].socket].broadcast.to(conversationId).emit('evt', message);
         }

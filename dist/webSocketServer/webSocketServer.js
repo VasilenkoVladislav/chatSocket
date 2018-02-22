@@ -18,16 +18,24 @@ class WebSocketServer {
             };
             socket.on('subscribeChannel', (message) => {
                 socket.join(message);
-                this.redis.subscribe(`${message}?${client}`);
+                this.clients[client + message] = {
+                    'socket': socket.id
+                };
+                this.redis.subscribe(`${client}?${message}`);
             });
             socket.on('disconnect', () => {
-                this.redis.unsubscribe();
+                for (let name in this.clients) {
+                    if (this.clients[name].socket === socket.id) {
+                        delete this.clients[name];
+                        this.redis.unsubscribe(name);
+                    }
+                }
             });
         });
     }
     broadcastMessage(channel, message) {
-        const conversationId = channel.split('?')[0];
-        const clientId = channel.split('?')[1];
+        const clientId = channel.split('?')[0];
+        const conversationId = channel.split('?')[1];
         if (conversationId && clientId) {
             this.io.sockets.connected[this.clients[clientId].socket].broadcast.to(conversationId).emit('evt', message);
         }
